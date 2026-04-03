@@ -1,0 +1,30 @@
+name: mis_lecturas
+description: "Private reading tracker MVP built with Flutter."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_riverpod: ^2.6.1
+  go_router: ^16.0.0
+  http: ^1.5.0
+  fl_chart: ^1.1.1
+  firebase_core: ^4.1.0
+  cloud_firestore: ^6.0.0
+  firebase_auth: ^6.0.0
+  cached_network_image: ^3.4.1
+  shared_preferences: ^2.5.3
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
