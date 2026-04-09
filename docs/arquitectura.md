@@ -1,45 +1,40 @@
-# Arquitectura Propuesta
+# Arquitectura
 
-## 1) Plataforma y módulos
+## Principios
 
-### Cliente único Flutter
-- **Targets**: Android APK y Web/Desktop.
-- **Capas**:
-  - Presentación (Widgets + navegación)
-  - Dominio (casos de uso)
-  - Datos (Firestore, Auth, Google Books API)
+- Local-first: la aplicación funciona sin autenticación y sin sincronización remota.
+- Reactiva: Riverpod observa los cambios de Isar y actualiza la UI sin recargas manuales.
+- Modular: cada feature encapsula su UI, su lógica y su acceso a datos.
 
-### Servicios externos
-- Firebase Auth: login seguro y simple.
-- Cloud Firestore: persistencia en tiempo real.
-- Cloud Storage: almacenamiento de carátulas personalizadas (si aplica).
-- Google Books API: búsqueda/importación de metadatos.
+## Capas
 
-## 2) Flujo de datos
-1. Usuario inicia sesión.
-2. Se carga perfil y configuración.
-3. En buscador se consulta Google Books.
-4. Al importar, se genera documento de libro + entrada de progreso.
-5. Cada avance actualiza progreso diario para analíticas.
-6. Dashboard consulta agregados por periodos.
+### Core
 
-## 3) Seguridad y privacidad
-- Reglas Firestore por `request.auth.uid`.
-- Todas las colecciones bajo `/users/{uid}/...`.
-- Sin características sociales ni datos compartidos.
-- Logout y revocación de sesión local.
+- Tema visual premium con variantes clara y oscura.
+- Router con `StatefulShellRoute` para Biblioteca, Buscar y Panel.
+- Proveedores globales como la instancia de Isar.
 
-## 4) Estrategia de sincronización
-- Firestore offline persistence habilitado.
-- Resolución de conflictos por `updatedAt` (last-write-wins).
-- Cola local para operaciones sin conexión.
+### Features
 
-## 5) Rendimiento
-- Paginación en listados de biblioteca.
-- Índices para filtros por estado, tags y fechas.
-- Materialización opcional de métricas diarias (`daily_stats`) para dashboard rápido.
+- `books`: biblioteca, detalle del libro, repositorio Isar y métricas.
+- `search`: integración con Google Books API.
+- `analytics`: visualización de páginas por mes, géneros y racha actual.
 
-## 6) UX/UI
-- Diseño minimalista, modo oscuro/claro, tipografía legible.
-- Gestos Android: swipe para cambiar estado y actualizar progreso.
-- Acciones de un toque para mover entre listas dinámicas.
+### Shared
+
+- Modelo de dominio `Book`.
+- Modelo persistente `BookRecord` para Isar.
+- Widgets reutilizables como `BookCover`, `EmptyState` y la shell inferior.
+
+## Persistencia
+
+- Isar almacena libros, etiquetas y cronología de eventos.
+- Cada actualización de progreso o estado puede generar un evento de timeline.
+- Las analíticas se calculan a partir de esos eventos en lugar de datos mockeados.
+
+## Navegación
+
+- `/library`: biblioteca principal.
+- `/library/book/:bookId`: ficha de lectura con transición personalizada.
+- `/search`: búsqueda remota.
+- `/analytics`: panel de estadísticas.

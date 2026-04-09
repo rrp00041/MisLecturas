@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 enum BookStatus { reading, read, toRead, abandoned }
 
 extension BookStatusX on BookStatus {
@@ -10,7 +8,7 @@ extension BookStatusX on BookStatus {
       case BookStatus.read:
         return 'Leído';
       case BookStatus.toRead:
-        return 'Por leer';
+        return 'Pendiente';
       case BookStatus.abandoned:
         return 'Abandonado';
     }
@@ -37,6 +35,20 @@ extension BookStatusX on BookStatus {
   }
 }
 
+class ReadingTimelineEvent {
+  const ReadingTimelineEvent({
+    required this.type,
+    required this.label,
+    required this.occurredAt,
+    this.pagesDelta = 0,
+  });
+
+  final String type;
+  final String label;
+  final DateTime occurredAt;
+  final int pagesDelta;
+}
+
 class Book {
   const Book({
     required this.id,
@@ -52,6 +64,8 @@ class Book {
     required this.review,
     required this.createdAt,
     required this.updatedAt,
+    required this.tags,
+    required this.timeline,
     this.googleBookId,
     this.startedAt,
     this.finishedAt,
@@ -70,17 +84,24 @@ class Book {
   final String review;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final List<String> tags;
+  final List<ReadingTimelineEvent> timeline;
   final String? googleBookId;
   final DateTime? startedAt;
   final DateTime? finishedAt;
 
   double get progress {
-    if (totalPages <= 0) return 0;
+    if (totalPages <= 0) {
+      return 0;
+    }
     return (currentPage / totalPages).clamp(0, 1);
   }
 
   String get authorsLabel =>
       authors.isEmpty ? 'Autor desconocido' : authors.join(', ');
+
+  bool get isFavorite =>
+      tags.any((tag) => tag.trim().toLowerCase() == 'favorito');
 
   Book copyWith({
     String? id,
@@ -96,6 +117,8 @@ class Book {
     String? review,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<String>? tags,
+    List<ReadingTimelineEvent>? timeline,
     String? googleBookId,
     DateTime? startedAt,
     bool clearStartedAt = false,
@@ -116,70 +139,11 @@ class Book {
       review: review ?? this.review,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      tags: tags ?? this.tags,
+      timeline: timeline ?? this.timeline,
       googleBookId: googleBookId ?? this.googleBookId,
       startedAt: clearStartedAt ? null : startedAt ?? this.startedAt,
       finishedAt: clearFinishedAt ? null : finishedAt ?? this.finishedAt,
     );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'title': title,
-      'authors': authors,
-      'categories': categories,
-      'description': description,
-      'coverUrl': coverUrl,
-      'totalPages': totalPages,
-      'status': status.storageValue,
-      'currentPage': currentPage,
-      'rating': rating,
-      'review': review,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt.toIso8601String(),
-      'googleBookId': googleBookId,
-      'startedAt': startedAt?.toIso8601String(),
-      'finishedAt': finishedAt?.toIso8601String(),
-    };
-  }
-
-  factory Book.fromMap(Map<String, dynamic> map) {
-    return Book(
-      id: map['id'] as String,
-      title: map['title'] as String? ?? '',
-      authors: List<String>.from(map['authors'] as List? ?? const []),
-      categories: List<String>.from(map['categories'] as List? ?? const []),
-      description: map['description'] as String? ?? '',
-      coverUrl: map['coverUrl'] as String? ?? '',
-      totalPages: map['totalPages'] as int? ?? 0,
-      status: BookStatusX.fromStorage(map['status'] as String? ?? 'toRead'),
-      currentPage: map['currentPage'] as int? ?? 0,
-      rating: (map['rating'] as num? ?? 0).toDouble(),
-      review: map['review'] as String? ?? '',
-      createdAt:
-          DateTime.tryParse(map['createdAt'] as String? ?? '') ??
-          DateTime.now(),
-      updatedAt:
-          DateTime.tryParse(map['updatedAt'] as String? ?? '') ??
-          DateTime.now(),
-      googleBookId: map['googleBookId'] as String?,
-      startedAt: map['startedAt'] == null
-          ? null
-          : DateTime.tryParse(map['startedAt'] as String),
-      finishedAt: map['finishedAt'] == null
-          ? null
-          : DateTime.tryParse(map['finishedAt'] as String),
-    );
-  }
-
-  static String encodeList(List<Book> books) {
-    return jsonEncode(books.map((book) => book.toMap()).toList());
-  }
-
-  static List<Book> decodeList(String raw) {
-    final decoded = jsonDecode(raw) as List<dynamic>;
-    return decoded
-        .map((item) => Book.fromMap(Map<String, dynamic>.from(item as Map)))
-        .toList();
   }
 }

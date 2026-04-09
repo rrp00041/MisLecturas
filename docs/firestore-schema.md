@@ -1,69 +1,37 @@
-# Modelo de Datos (Firestore)
+# Esquema Local (Isar)
 
-## Estructura principal
+Este documento conserva la ruta histórica, pero el proyecto actual ya no usa Firestore. La persistencia está implementada con Isar.
 
-```text
-users/{uid}
-  profile/{profileDoc}
-  books/{bookId}
-  lists/{listId}
-  reading_sessions/{sessionId}
-  daily_stats/{yyyyMMdd}
-```
+## Colección `BookRecord`
 
-## users/{uid}/books/{bookId}
-Campos recomendados:
-- `title` (string)
-- `authors` (array<string>)
-- `genre` (array<string>)
-- `coverUrl` (string)
-- `googleBookId` (string)
-- `isbn10` (string?)
-- `isbn13` (string?)
-- `status` (enum: reading|pending|read|rereading|dropped)
-- `customLists` (array<listId>)
-- `startedAt` (timestamp?)
-- `finishedAt` (timestamp?)
-- `review` (string)
-- `tags` (array<string>)
-- `rating` (double, 0.0..5.0)
-- `currentPage` (number)
-- `totalPages` (number)
-- `createdAt` (timestamp)
-- `updatedAt` (timestamp)
+- `externalId`: identificador estable del libro en la app.
+- `title`
+- `authors`
+- `categories`
+- `tags`
+- `description`
+- `coverUrl`
+- `totalPages`
+- `status`
+- `currentPage`
+- `rating`
+- `review`
+- `createdAt`
+- `updatedAt`
+- `googleBookId`
+- `startedAt`
+- `finishedAt`
+- `timeline`
 
-## users/{uid}/lists/{listId}
-- `name` (string)
-- `color` (string hex)
-- `icon` (string)
-- `createdAt` (timestamp)
-- `updatedAt` (timestamp)
+## Objeto embebido `ReadingTimelineRecord`
 
-## users/{uid}/reading_sessions/{sessionId}
-Representa lectura diaria para analítica fina.
-- `bookId` (string)
-- `date` (timestamp)
-- `pagesRead` (number)
-- `durationMinutes` (number?)
-- `createdAt` (timestamp)
+- `type`: `created`, `started`, `progress`, `status`, `finished`
+- `label`: texto legible para la UI
+- `occurredAt`
+- `pagesDelta`
 
-## users/{uid}/daily_stats/{yyyyMMdd}
-Documento agregado por día para dashboard.
-- `date` (timestamp)
-- `pagesRead` (number)
-- `booksFinished` (number)
-- `sessions` (number)
-- `weekday` (number, 1..7)
+## Uso del timeline
 
-## Consultas clave
-1. Libros leídos por mes/año: `books` filtrado por `finishedAt` rango.
-2. Páginas por día/semana: `daily_stats` por fechas.
-3. Géneros/autores más leídos: agregación cliente sobre `books` con `status=read`.
-4. Heatmap semanal: `daily_stats` agrupado por `weekday`.
-5. Predicción fin de libro: media móvil 7 días en `daily_stats` y `remainingPages`.
-
-## Índices sugeridos
-- `books(status, updatedAt desc)`
-- `books(status, finishedAt desc)`
-- `books(tags array-contains, updatedAt desc)`
-- `books(customLists array-contains, updatedAt desc)`
+- Permite calcular páginas leídas por mes.
+- Permite calcular la racha actual.
+- Sirve como cronología visible dentro de la ficha del libro.

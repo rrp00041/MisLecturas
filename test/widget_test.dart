@@ -1,30 +1,48 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:mis_lecturas/app.dart';
-import 'package:mis_lecturas/core/providers/app_providers.dart';
+import 'package:mis_lecturas/features/books/presentation/books_controller.dart';
+import 'package:mis_lecturas/shared/models/book.dart';
 
 void main() {
-  testWidgets('app renders login screen by default', (
-    WidgetTester tester,
-  ) async {
-    SharedPreferences.setMockInitialValues({});
-
-    await tester.pumpWidget(
-      ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(
-            await SharedPreferences.getInstance(),
-          ),
-        ],
-        child: const MyLibraryApp(),
-      ),
+  test('library stats calculate streak and pages per month from timeline', () {
+    final now = DateTime.now();
+    final book = Book(
+      id: 'book-1',
+      title: 'Test Book',
+      authors: const ['Author'],
+      categories: const ['Fantasy'],
+      description: 'Example',
+      coverUrl: '',
+      totalPages: 300,
+      status: BookStatus.reading,
+      currentPage: 42,
+      rating: 4,
+      review: 'Great',
+      createdAt: now,
+      updatedAt: now,
+      tags: const ['Favorito'],
+      timeline: [
+        ReadingTimelineEvent(
+          type: 'progress',
+          label: 'Leídas 20 páginas',
+          occurredAt: now,
+          pagesDelta: 20,
+        ),
+        ReadingTimelineEvent(
+          type: 'progress',
+          label: 'Leídas 22 páginas',
+          occurredAt: now.subtract(const Duration(days: 1)),
+          pagesDelta: 22,
+        ),
+      ],
     );
 
-    await tester.pumpAndSettle();
+    final stats = LibraryStats.fromBooks([book]);
 
-    expect(find.text('MisLecturas'), findsOneWidget);
-    expect(find.text('Entrar'), findsOneWidget);
+    expect(stats.totalBooks, 1);
+    expect(stats.favoriteBooks, 1);
+    expect(stats.currentStreak, 2);
+    expect(stats.genreDistribution['Fantasy'], 1);
+    expect(stats.pagesPerMonth[now.month], 42);
   });
 }

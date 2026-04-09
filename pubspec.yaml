@@ -1,7 +1,7 @@
 name: mis_lecturas
-description: "Private reading tracker MVP built with Flutter."
+description: "Local-first reading tracker with a premium Flutter UI."
 publish_to: 'none'
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ^3.11.4
@@ -14,17 +14,20 @@ dependencies:
   go_router: ^16.0.0
   http: ^1.5.0
   fl_chart: ^1.1.1
-  firebase_core: ^4.1.0
-  cloud_firestore: ^6.0.0
-  firebase_auth: ^6.0.0
   cached_network_image: ^3.4.1
-  shared_preferences: ^2.5.3
+  flutter_staggered_animations: ^1.1.1
+  google_fonts: ^6.3.1
   intl: ^0.20.2
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  build_runner: ^2.4.13
+  isar_generator: ^3.1.0+1
 
 flutter:
   uses-material-design: true

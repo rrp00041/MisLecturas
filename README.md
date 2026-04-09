@@ -1,33 +1,46 @@
-# MyPersonal Library App
+# MisLecturas
 
-Aplicación privada de gestión de lectura con sincronización en la nube, disponible en Android (APK) y Web/Desktop desde una sola base de código Flutter.
+Aplicación Flutter local-first para gestionar lecturas, progreso, etiquetas y analíticas personales desde una única base de código.
 
 ## Enfoque
-- **Privado primero**: autenticación obligatoria, datos aislados por usuario.
-- **Rendimiento**: diseño orientado a consultas agregadas y lecturas rápidas.
-- **Analítica profunda**: métricas de hábitos de lectura y proyecciones.
+
+- Privado de verdad: no hay cuentas ni backend. Todo vive en la base de datos local.
+- Rendimiento: Isar como persistencia reactiva y rápida.
+- Experiencia premium: modo oscuro profundo, tarjetas redondeadas, animaciones suaves y transiciones `Hero`.
+- Analítica útil: páginas leídas por mes, géneros y racha calculados desde eventos reales.
 
 ## Stack
-- **Frontend**: Flutter (Android + Web + Desktop)
-- **Auth/Backend**: Firebase Authentication + Cloud Firestore + Cloud Storage
-- **Analíticas visuales**: `fl_chart` (o Chart.js si se monta dashboard web embebido)
-- **Estado**: Riverpod (recomendado)
 
-## Documentación técnica
-- Arquitectura: `docs/arquitectura.md`
-- Modelo de datos Firestore: `docs/firestore-schema.md`
-- Plan de implementación: `docs/roadmap.md`
+- Flutter multiplataforma
+- Riverpod para estado reactivo
+- GoRouter para navegación
+- Isar para base de datos local
+- Google Books API para búsqueda e importación
+- fl_chart para visualizaciones
+- google_fonts + flutter_staggered_animations para UI/UX
 
-## Estructura inicial
-- `lib/main.dart`: bootstrap de app y tema claro/oscuro.
-- `lib/core/router.dart`: rutas principales.
-- `lib/features/auth/`: login con Firebase Auth.
-- `lib/features/books/`: buscador Google Books + colección personal.
-- `lib/features/analytics/`: dashboard de gráficas e insights.
+## Estructura principal
 
-## Próximos pasos
-1. Crear proyecto Firebase y configurar Android/Web.
-2. Habilitar Email/Password en Firebase Auth.
-3. Crear índices compuestos en Firestore (ver documento de esquema).
-4. Implementar ingestión de Google Books con caché local.
-5. Construir dashboard con consultas agregadas por periodo.
+- `lib/main.dart`: inicializa Isar y arranca la app.
+- `lib/core/`: router, tema y proveedores globales.
+- `lib/features/books/`: biblioteca, ficha de lectura, repositorio Isar y analytics derivados.
+- `lib/features/search/`: búsqueda remota en Google Books.
+- `lib/shared/models/`: modelo de dominio y esquema Isar.
+- `lib/shared/widgets/`: componentes reutilizables de UI.
+
+## Flujo del producto
+
+1. Buscar un libro en Google Books.
+2. Guardarlo en la biblioteca local.
+3. Actualizar progreso, etiquetas, rating y notas.
+4. Consultar panel de estadísticas calculado desde la cronología de lectura.
+
+## Comandos útiles
+
+```bash
+flutter pub get
+dart run build_runner build --delete-conflicting-outputs
+flutter analyze
+flutter test
+flutter run
+```

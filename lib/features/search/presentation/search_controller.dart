@@ -21,11 +21,11 @@ class SearchController extends AsyncNotifier<List<SearchResult>> {
   }
 
   Future<void> search(String query) async {
+    if (query.trim().isEmpty) {
+      state = const AsyncData([]);
+      return;
+    }
     state = const AsyncLoading();
     state = await AsyncValue.guard(() => _service.search(query));
-  }
-
-  void clear() {
-    state = const AsyncData([]);
   }
 }

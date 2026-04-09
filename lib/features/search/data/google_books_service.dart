@@ -11,7 +11,9 @@ class GoogleBooksService {
 
   Future<List<SearchResult>> search(String query) async {
     final trimmed = query.trim();
-    if (trimmed.isEmpty) return [];
+    if (trimmed.isEmpty) {
+      return [];
+    }
 
     final uri = Uri.https('www.googleapis.com', '/books/v1/volumes', {
       'q': trimmed,
@@ -26,6 +28,7 @@ class GoogleBooksService {
 
     final payload = jsonDecode(response.body) as Map<String, dynamic>;
     final items = payload['items'] as List<dynamic>? ?? const [];
+
     return items.map((item) {
       final map = Map<String, dynamic>.from(item as Map);
       final volume = Map<String, dynamic>.from(
@@ -34,6 +37,7 @@ class GoogleBooksService {
       final images = Map<String, dynamic>.from(
         volume['imageLinks'] as Map? ?? const <String, dynamic>{},
       );
+
       return SearchResult(
         id:
             map['id'] as String? ??
